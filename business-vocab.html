@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizLex — Business Vocabulary Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f1b2d;
+  --navy2: #162236;
+  --navy3: #1e2e45;
+  --gold: #c9a84c;
+  --gold2: #e8c97a;
+  --cream: #f5f0e8;
+  --cream2: #ede7d8;
+  --text: #f0ece3;
+  --text2: #a8a090;
+  --text3: #6e6860;
+  --green: #4caf82;
+  --red: #e05c5c;
+  --blue: #5b9bd5;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-bottom: 0.5px solid rgba(201,168,76,0.2);
+  position: sticky; top: 0; z-index: 100;
+  background: var(--navy);
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 0.02em; }
+.logo span { color: var(--text2); font-weight: 400; font-size: 13px; margin-left: 8px; font-family: 'DM Sans', sans-serif; }
+.nav-tabs { display: flex; gap: 4px; background: var(--navy2); border-radius: var(--radius-sm); padding: 4px; }
+.nav-tab { padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text2); border: none; background: transparent; transition: all 0.2s; }
+.nav-tab.active { background: var(--gold); color: var(--navy); }
+.nav-tab:hover:not(.active) { color: var(--text); }
+.streak-badge { display: flex; align-items: center; gap: 6px; background: var(--navy2); border: 0.5px solid rgba(201,168,76,0.3); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--gold2); }
+
+/* PAGES */
+.page { display: none; padding: 2rem; max-width: 800px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* WORD CARD */
+.word-hero { margin-bottom: 2rem; }
+.word-date { font-size: 12px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+.category-badge { display: inline-block; font-size: 11px; padding: 4px 12px; border-radius: 20px; background: rgba(201,168,76,0.15); color: var(--gold); border: 0.5px solid rgba(201,168,76,0.3); font-weight: 500; letter-spacing: 0.05em; margin-bottom: 16px; }
+.word-main { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 6px; }
+.word-name { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--cream); line-height: 1; }
+.word-type { font-size: 13px; color: var(--text3); font-style: italic; margin-bottom: 6px; }
+.word-pron { font-size: 16px; color: var(--gold2); margin-bottom: 1.5rem; font-style: italic; }
+.divider { height: 0.5px; background: rgba(255,255,255,0.08); margin: 1.5rem 0; }
+
+.section-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); font-weight: 600; margin-bottom: 8px; }
+.definition-text { font-size: 16px; line-height: 1.7; color: var(--text); }
+.example-block { border-left: 2px solid var(--gold); padding: 10px 16px; margin: 8px 0; background: rgba(201,168,76,0.05); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.example-text { font-size: 14px; color: var(--text2); line-height: 1.6; font-style: italic; }
+.synonyms-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.syn-pill { background: var(--navy2); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 14px; font-size: 13px; color: var(--text2); }
+.memory-box { background: linear-gradient(135deg, rgba(91,155,213,0.1), rgba(76,175,130,0.1)); border: 0.5px solid rgba(91,155,213,0.3); border-radius: var(--radius); padding: 14px 18px; margin-top: 8px; }
+.memory-text { font-size: 14px; color: var(--blue); line-height: 1.6; }
+
+.action-row { display: flex; gap: 12px; margin-top: 2rem; flex-wrap: wrap; }
+.btn { padding: 12px 22px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold:hover { background: var(--gold2); }
+.btn-outline { background: transparent; color: var(--text); border: 0.5px solid rgba(255,255,255,0.2); }
+.btn-outline:hover { background: var(--navy2); border-color: rgba(255,255,255,0.35); }
+.btn-green { background: rgba(76,175,130,0.15); color: var(--green); border: 0.5px solid rgba(76,175,130,0.3); }
+.btn-green:hover { background: rgba(76,175,130,0.25); }
+.btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 6px; }
+
+/* PROGRESS BARS */
+.stats-grid { display: grid; grid-columns: repeat(3, 1fr); grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 2rem; }
+.stat-card { background: var(--navy2); border-radius: var(--radius); padding: 1.25rem; border: 0.5px solid rgba(255,255,255,0.06); }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--gold); }
+.stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+/* DICTIONARY */
+.search-bar { width: 100%; padding: 12px 18px; background: var(--navy2); border: 0.5px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); color: var(--text); font-size: 15px; font-family: 'DM Sans', sans-serif; margin-bottom: 1rem; outline: none; }
+.search-bar:focus { border-color: rgba(201,168,76,0.4); }
+.filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+.filter-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 0.5px solid rgba(255,255,255,0.12); background: transparent; color: var(--text2); font-family: 'DM Sans', sans-serif; transition: all 0.18s; }
+.filter-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+.word-list { display: flex; flex-direction: column; gap: 8px; }
+.word-row { background: var(--navy2); border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 0.5px solid rgba(255,255,255,0.05); transition: all 0.18s; }
+.word-row:hover { border-color: rgba(201,168,76,0.3); background: var(--navy3); }
+.word-row-left { display: flex; flex-direction: column; gap: 2px; }
+.word-row-name { font-size: 16px; font-weight: 500; color: var(--cream); }
+.word-row-type { font-size: 12px; color: var(--text3); }
+.word-row-right { display: flex; align-items: center; gap: 8px; }
+.learned-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+
+/* QUIZ */
+.quiz-card { background: var(--navy2); border-radius: var(--radius); padding: 2rem; border: 0.5px solid rgba(255,255,255,0.06); }
+.quiz-q { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--cream); line-height: 1.4; margin-bottom: 1.5rem; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.quiz-option { padding: 14px 18px; background: var(--navy3); border: 0.5px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; color: var(--text); transition: all 0.18s; text-align: left; font-family: 'DM Sans', sans-serif; }
+.quiz-option:hover:not(.disabled) { border-color: rgba(201,168,76,0.4); color: var(--gold2); }
+.quiz-option.correct { background: rgba(76,175,130,0.15); border-color: var(--green); color: var(--green); }
+.quiz-option.wrong { background: rgba(224,92,92,0.15); border-color: var(--red); color: var(--red); }
+.quiz-option.disabled { cursor: default; }
+.quiz-progress { display: flex; gap: 4px; margin-bottom: 1.5rem; }
+.quiz-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--navy3); }
+.quiz-dot.done { background: var(--gold); }
+.quiz-dot.correct { background: var(--green); }
+.quiz-dot.wrong { background: var(--red); }
+.quiz-result { text-align: center; padding: 2rem 0; }
+.quiz-score { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; color: var(--gold); }
+.quiz-msg { font-size: 16px; color: var(--text2); margin-top: 8px; }
+
+/* EMAIL MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,18,30,0.85); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--navy2); border-radius: var(--radius); padding: 2rem; max-width: 500px; width: 90%; border: 0.5px solid rgba(201,168,76,0.2); }
+.modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 6px; color: var(--cream); }
+.modal p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 1.25rem; }
+.modal input { width: 100%; padding: 11px 14px; background: var(--navy3); border: 0.5px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm); color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; margin-bottom: 12px; outline: none; }
+.modal input:focus { border-color: rgba(201,168,76,0.4); }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--navy2); border: 0.5px solid rgba(201,168,76,0.3); color: var(--gold2); padding: 12px 22px; border-radius: var(--radius-sm); font-size: 14px; z-index: 300; transition: transform 0.35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* EXPANDED WORD VIEW IN DICT */
+.word-expanded { background: var(--navy3); border-radius: var(--radius-sm); padding: 16px; margin-top: 4px; border: 0.5px solid rgba(201,168,76,0.15); }
+
+.learned-badge { background: rgba(76,175,130,0.15); color: var(--green); border: 0.5px solid rgba(76,175,130,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; }
+
+h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--cream); margin-bottom: 1.5rem; }
+
+@media (max-width: 600px) {
+  nav { padding: 1rem; }
+  .nav-tabs { display: none; }
+  .page { padding: 1.25rem; }
+  .word-name { font-size: 36px; }
+  .quiz-options { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">BizLex <span>Business Vocabulary</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('today')">Today</button>
+    <button class="nav-tab" onclick="showPage('dictionary')">Dictionary</button>
+    <button class="nav-tab" onclick="showPage('quiz')">Quiz</button>
+    <button class="nav-tab" onclick="showPage('progress')">Progress</button>
+  </div>
+  <div class="streak-badge" id="streak-badge">🔥 <span id="streak-count">0</span> day streak</div>
+</nav>
+
+<!-- TODAY PAGE -->
+<div class="page active" id="page-today">
+  <div class="word-date" id="today-date"></div>
+  <div class="category-badge" id="word-category"></div>
+  <div class="word-hero">
+    <div class="word-main">
+      <div class="word-name" id="word-name"></div>
+    </div>
+    <div class="word-type" id="word-type"></div>
+    <div class="word-pron" id="word-pron"></div>
+    <div class="section-label">Definition</div>
+    <div class="definition-text" id="word-def"></div>
+    <div class="divider"></div>
+    <div class="section-label">Practical Examples</div>
+    <div id="word-examples"></div>
+    <div class="divider"></div>
+    <div class="section-label">Synonyms</div>
+    <div class="synonyms-row" id="word-syns"></div>
+    <div class="divider"></div>
+    <div class="section-label">Memory Tip</div>
+    <div class="memory-box"><div class="memory-text" id="word-tip"></div></div>
+  </div>
+  <div class="action-row">
+    <button class="btn btn-gold" onclick="markLearned()">✓ Mark as Learned</button>
+    <button class="btn btn-green" onclick="openEmailModal()">✉ Email to Myself</button>
+    <button class="btn btn-outline" onclick="nextWord()">Next Word →</button>
+  </div>
+  <div id="learned-msg" style="margin-top:12px;font-size:13px;color:var(--green);display:none;">✓ Added to your learned words!</div>
+</div>
+
+<!-- DICTIONARY PAGE -->
+<div class="page" id="page-dictionary">
+  <h2>All Words <span style="font-size:14px;font-weight:400;color:var(--text3)" id="dict-count"></span></h2>
+  <input class="search-bar" type="text" placeholder="Search words..." id="search-input" oninput="filterWords()">
+  <div class="filter-row" id="filter-row"></div>
+  <div class="word-list" id="word-list"></div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page" id="page-quiz">
+  <h2>Vocabulary Quiz</h2>
+  <div id="quiz-start">
+    <p style="color:var(--text2);margin-bottom:1.5rem;font-size:15px;">Test yourself on the words you've been learning. 10 questions per round — definitions, examples, or synonyms.</p>
+    <div class="stats-grid" style="margin-bottom:1.5rem;">
+      <div class="stat-card"><div class="stat-num" id="q-best">0%</div><div class="stat-label">Best score</div></div>
+      <div class="stat-card"><div class="stat-num" id="q-played">0</div><div class="stat-label">Rounds played</div></div>
+      <div class="stat-card"><div class="stat-num" id="q-avg">0%</div><div class="stat-label">Avg score</div></div>
+    </div>
+    <button class="btn btn-gold" onclick="startQuiz()">Start Quiz</button>
+  </div>
+  <div id="quiz-active" style="display:none;">
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div class="quiz-card">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:12px;" id="quiz-counter"></div>
+      <div class="quiz-q" id="quiz-question"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div id="quiz-feedback" style="margin-top:1rem;font-size:14px;display:none;"></div>
+    </div>
+  </div>
+  <div id="quiz-done" style="display:none;">
+    <div class="quiz-result">
+      <div class="quiz-score" id="quiz-final-score"></div>
+      <div class="quiz-msg" id="quiz-final-msg"></div>
+      <div style="margin-top:2rem;display:flex;gap:12px;justify-content:center;">
+        <button class="btn btn-gold" onclick="startQuiz()">Play Again</button>
+        <button class="btn btn-outline" onclick="showPage('dictionary')">Review Words</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS PAGE -->
+<div class="page" id="page-progress">
+  <h2>Your Progress</h2>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="p-learned">0</div><div class="stat-label">Words learned</div></div>
+    <div class="stat-card"><div class="stat-num" id="p-streak">0</div><div class="stat-label">Day streak</div></div>
+    <div class="stat-card"><div class="stat-num" id="p-total">150</div><div class="stat-label">Total words</div></div>
+  </div>
+  <div style="background:var(--navy2);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
+    <div class="section-label" style="margin-bottom:12px;">Completion</div>
+    <div style="background:var(--navy3);border-radius:4px;height:8px;overflow:hidden;">
+      <div id="progress-bar" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;width:0%;transition:width 0.6s;"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px;" id="progress-pct">0% complete</div>
+  </div>
+  <div style="background:var(--navy2);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
+    <div class="section-label" style="margin-bottom:12px;">Learned Words</div>
+    <div id="learned-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    <div id="no-learned" style="font-size:14px;color:var(--text3);">Mark words as learned to see them here.</div>
+  </div>
+  <div style="background:var(--navy2);border-radius:var(--radius);padding:1.25rem;">
+    <div class="section-label" style="margin-bottom:12px;">Daily email setup</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:12px;">To receive a word every morning automatically — no external app needed:</p>
+    <ol style="font-size:14px;color:var(--text2);line-height:2;padding-left:1.25rem;">
+      <li>Open <strong style="color:var(--cream)">Google Sheets</strong> → Extensions → Apps Script</li>
+      <li>Paste the script below and save</li>
+      <li>Set a daily trigger (Triggers → Add Trigger → Time-driven → Day timer → 8am)</li>
+      <li>Done — word arrives in your inbox every morning ☑</li>
+    </ol>
+    <button class="btn btn-outline btn-sm" style="margin-top:1rem;" onclick="copyScript()">Copy Google Apps Script</button>
+    <div id="copy-confirm" style="font-size:12px;color:var(--green);margin-top:8px;display:none;">✓ Script copied! Paste it in Apps Script editor.</div>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <h3>Email today's word</h3>
+    <p>Enter your email address. Your mail client will open with today's word pre-filled — just hit send to yourself.</p>
+    <input type="email" id="email-input" placeholder="you@example.com">
+    <div class="modal-btns">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold btn-sm" onclick="sendEmail()">Open in Mail</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const WORDS = [
+  {w:"Amortization",t:"noun",p:"/ˌæmərtɪˈzeɪʃən/",cat:"Finance",d:"The process of spreading the cost of an intangible asset or loan repayment over a fixed period through scheduled payments.",ex:["The company's amortization schedule shows the loan will be fully paid off in seven years.","CFOs track amortization carefully to understand the true cost of acquired intellectual property."],syn:["depreciation","write-down","reduction","payoff"],tip:"Think: 'a-mort' — to gradually kill off a debt until it is dead."},
+  {w:"Arbitrage",t:"noun",p:"/ˈɑːrbɪtrɑːʒ/",cat:"Finance",d:"The simultaneous purchase and sale of an asset in different markets to profit from a price discrepancy.",ex:["Traders engaged in arbitrage between the London and New York exchanges to exploit the temporary price gap.","Retail arbitrage — buying discounted goods and reselling them — is a legitimate business strategy."],syn:["price speculation","spread trading","profit-taking"],tip:"'Arbitrage' comes from French 'arbiter' — to judge between two prices."},
+  {w:"Liquidity",t:"noun",p:"/lɪˈkwɪdɪti/",cat:"Finance",d:"The ease with which an asset can be converted into cash without significantly affecting its market price.",ex:["The startup maintained strong liquidity by keeping three months of operating expenses in cash.","Investors value high-liquidity assets during economic downturns when access to cash is critical."],syn:["cash flow","solvency","fluidity","convertibility"],tip:"Like water (liquid), a liquid asset flows quickly into cash."},
+  {w:"Fiduciary",t:"adjective / noun",p:"/fɪˈdjuːʃɪɛri/",cat:"Finance",d:"Relating to the trust and legal obligation to act in another party's best financial interest.",ex:["As a board member, she had a fiduciary duty to prioritize shareholders' interests above her own.","The fund manager was sued for breaching his fiduciary responsibility by self-dealing."],syn:["trustee","guardian","custodial","legal representative"],tip:"From Latin 'fiducia' — trust. A fiduciary is trusted with someone else's money."},
+  {w:"Solvency",t:"noun",p:"/ˈsɒlvənsi/",cat:"Finance",d:"The ability of a company to meet its long-term financial obligations and debts.",ex:["Despite the market downturn, the company's solvency remained intact thanks to conservative debt management.","Solvency ratios are key indicators that lenders evaluate before extending large credit lines."],syn:["financial stability","creditworthiness","fiscal health"],tip:"Solvency = can you 'solve' (pay off) all debts? If yes, you're solvent."},
+  {w:"Collateral",t:"noun",p:"/kəˈlætərəl/",cat:"Finance",d:"An asset pledged by a borrower to a lender as security against a loan, which may be seized if the loan is not repaid.",ex:["The entrepreneur used her commercial property as collateral to secure the business expansion loan.","Lenders require collateral to minimize risk when the borrower has a limited credit history."],syn:["security","guarantee","pledge","surety"],tip:"'Col-lateral' — something standing 'alongside' the loan as backup."},
+  {w:"Equity",t:"noun",p:"/ˈɛkwɪti/",cat:"Finance",d:"The ownership value in a company after all liabilities have been deducted from its assets; also refers to stocks or shares.",ex:["After five years of reinvestment, the founders had built substantial equity in the business.","Equity financing allows startups to raise capital without taking on debt, in exchange for ownership stakes."],syn:["ownership stake","net worth","shareholding","capital"],tip:"'Equity' shares a root with 'equal' — it's your fair share of ownership."},
+  {w:"Leverage",t:"noun / verb",p:"/ˈlɛvərɪdʒ/",cat:"Finance",d:"The use of borrowed capital or resources to increase potential return on investment; also means using an advantage to maximum effect.",ex:["The acquisition was financed through significant leverage, with debt-to-equity ratio of 4:1.","She leveraged her industry contacts to secure a distribution deal within three months."],syn:["influence","borrowing power","advantage","control"],tip:"Like a lever in physics — a little force (money) moves a much bigger object."},
+  {w:"Depreciation",t:"noun",p:"/dɪˌpriːʃiˈeɪʃən/",cat:"Finance",d:"The reduction in value of an asset over time due to use, wear and tear, or obsolescence, recorded as an expense.",ex:["The firm's tax accountant applied accelerated depreciation on new equipment to reduce taxable income.","Depreciation is a non-cash expense that reduces book value without affecting current cash flow."],syn:["devaluation","write-down","asset reduction","amortization"],tip:"Depreciation makes assets 'less precious' — their value dePRECIATEs over time."},
+  {w:"Hedging",t:"noun / verb",p:"/ˈhɛdʒɪŋ/",cat:"Finance",d:"A risk management strategy that uses offsetting investments to reduce the potential for financial loss.",ex:["The airline hedged against fuel price increases by purchasing oil futures contracts six months in advance.","Currency hedging protected the exporter from the impact of exchange rate volatility."],syn:["risk mitigation","insurance","offsetting","balancing"],tip:"Like a garden hedge — you create a barrier to protect your assets from external risks."},
+  {w:"EBITDA",t:"noun",p:"/iːˈbɪtdɑː/",cat:"Finance",d:"Earnings Before Interest, Taxes, Depreciation, and Amortization — a measure of core operational profitability.",ex:["The company's EBITDA grew 23% year-over-year, signaling strong underlying business performance.","Investors use EBITDA as a benchmark when comparing profitability across companies with different capital structures."],syn:["operating earnings","core profit","operating cashflow proxy"],tip:"Strip out taxes, debt, and accounting tricks — EBITDA shows the raw engine power."},
+  {w:"Accrual",t:"noun",p:"/əˈkruːəl/",cat:"Finance",d:"An accounting method in which revenue and expenses are recorded when they are earned or incurred, not when cash changes hands.",ex:["Under accrual accounting, the sale is recorded in December even though payment arrives in January.","Accruals ensure financial statements reflect true economic activity during a given period."],syn:["recognition","booking","accumulation"],tip:"Accruals 'accrue' (grow/gather) — revenue you've earned but not yet touched."},
+  {w:"Covenant",t:"noun",p:"/ˈkʌvənənt/",cat:"Finance",d:"A binding clause in a loan agreement that requires the borrower to meet certain financial conditions or restrictions.",ex:["The loan covenant required the company to maintain a minimum current ratio of 1.5 at all times.","Breaching a financial covenant triggered a renegotiation of the entire credit facility."],syn:["clause","condition","stipulation","obligation"],tip:"A covenant is a sacred promise — in finance, it's the promise attached to your loan."},
+  {w:"Dividend",t:"noun",p:"/ˈdɪvɪdɛnd/",cat:"Finance",d:"A distribution of a portion of a company's earnings to its shareholders, usually paid quarterly.",ex:["The mature consumer goods company increased its annual dividend for the 15th consecutive year.","Growth-stage companies typically reinvest earnings rather than paying dividends to shareholders."],syn:["distribution","return","payout","yield"],tip:"'Dividend' — the company divides its profits and hands a share back to you."},
+  {w:"Pivot",t:"verb / noun",p:"/ˈpɪvət/",cat:"Strategy",d:"A fundamental change in business strategy, product direction, or target market in response to market feedback.",ex:["After poor traction in enterprise sales, the startup pivoted to a self-serve consumer model and grew 10x.","The pivot from hardware to software subscriptions transformed the company's revenue predictability."],syn:["shift","redirect","reposition","course-correct"],tip:"Like a basketball player — one foot stays planted (your core strengths) while you turn a new direction."},
+  {w:"Disruption",t:"noun",p:"/dɪsˈrʌpʃən/",cat:"Strategy",d:"A process by which a new entrant with a simpler, cheaper, or more accessible product displaces established competitors.",ex:["Streaming services caused massive disruption in the traditional cable television industry.","Disruptive innovation often starts by serving overlooked segments before moving upmarket."],syn:["innovation","upheaval","transformation","revolution"],tip:"'Disrupt' — to rupture what's normal and break existing patterns."},
+  {w:"Scalability",t:"noun",p:"/ˌskeɪləˈbɪlɪti/",cat:"Strategy",d:"The capacity of a business model or system to grow in revenue without a proportional increase in costs.",ex:["The SaaS model's scalability allows the company to onboard 1,000 new customers with minimal marginal cost.","Investors specifically look for scalability before committing growth-stage capital."],syn:["growth potential","expandability","elasticity"],tip:"Like a musical scale — scalability means you can go higher without retuning the whole instrument."},
+  {w:"Benchmarking",t:"noun",p:"/ˈbɛntʃmɑːkɪŋ/",cat:"Strategy",d:"The practice of comparing a company's performance metrics against industry standards or best-in-class competitors.",ex:["The operations team used benchmarking to identify that their fulfillment time was 40% slower than the industry median.","Competitive benchmarking revealed pricing gaps that informed a comprehensive go-to-market strategy overhaul."],syn:["comparison","performance measurement","standard-setting","evaluation"],tip:"A 'benchmark' was originally a surveyor's reference mark — your fixed reference point to measure from."},
+  {w:"Value Proposition",t:"noun",p:"/ˈvæljuː ˌprɒpəˈzɪʃən/",cat:"Strategy",d:"A clear statement of the specific benefits a company's product or service delivers to a defined customer segment.",ex:["The startup's value proposition — 'zero-commission international transfers in under a minute' — resonated immediately with expats.","A weak value proposition is the most common reason early-stage companies fail to gain market traction."],syn:["competitive advantage","unique benefit","differentiator","USP"],tip:"Ask: 'Why should this customer choose us over every alternative?' — that answer is your value proposition."},
+  {w:"Diversification",t:"noun",p:"/daɪˌvɜːsɪfɪˈkeɪʃən/",cat:"Strategy",d:"The expansion into new products, markets, or investments to reduce risk and create additional revenue streams.",ex:["The media company pursued geographic diversification by acquiring regional broadcasters in five emerging markets.","Portfolio diversification across asset classes reduced overall volatility during the market correction."],syn:["expansion","spread","variation","risk distribution"],tip:"'Don't put all eggs in one basket' — diversification creates multiple baskets."},
+  {w:"Agile",t:"adjective",p:"/ˈædʒaɪl/",cat:"Strategy",d:"An iterative, flexible approach to project management and product development that emphasizes collaboration and rapid delivery.",ex:["The development team adopted agile sprints to ship features every two weeks rather than quarterly.","Agile methodology allowed the marketing team to test campaigns quickly and respond to real-time data."],syn:["iterative","flexible","adaptive","responsive"],tip:"Agile = able to change direction quickly, like a nimble athlete."},
+  {w:"Competitive Moat",t:"noun",p:"/kəmˈpɛtɪtɪv moʊt/",cat:"Strategy",d:"A sustainable competitive advantage that protects a business from competitors, similar to a moat protecting a castle.",ex:["Apple's ecosystem lock-in creates a powerful competitive moat that competitors have struggled to breach for decades.","Warren Buffett famously evaluates every investment by asking: 'How wide is this company's moat?'"],syn:["competitive advantage","barrier to entry","defensibility","market protection"],tip:"A castle moat keeps enemies out — your business moat keeps competitors out."},
+  {w:"Market Penetration",t:"noun",p:"/ˈmɑːkɪt ˌpɛnɪˈtreɪʃən/",cat:"Strategy",d:"A growth strategy that seeks to increase market share for an existing product within existing markets.",ex:["The telco pursued aggressive market penetration pricing, offering 50% off introductory plans to capture volume.","They achieved 34% market penetration in the premium segment within 18 months of launch."],syn:["market share growth","share capture","expansion"],tip:"Penetrating = going deeper into a market you already know, not exploring new ones."},
+  {w:"Accountability",t:"noun",p:"/əˌkaʊntəˈbɪlɪti/",cat:"Leadership",d:"The obligation to accept responsibility for one's actions, decisions, and their outcomes within an organization.",ex:["The CEO emphasized accountability by publicly sharing quarterly targets and results with all 3,000 employees.","A culture of accountability means leaders own their failures as openly as they celebrate successes."],syn:["responsibility","ownership","answerability","transparency"],tip:"Accountability = you 'account' for your actions — you keep the record and own it."},
+  {w:"Delegation",t:"noun",p:"/ˌdɛlɪˈɡeɪʃən/",cat:"Leadership",d:"The process of assigning tasks, authority, and responsibility to others, enabling a leader to focus on higher-priority work.",ex:["Effective delegation freed the director to focus on strategy while her team managed operational execution.","Poor delegation — where the manager reclaims control mid-task — undermines trust and team development."],syn:["assignment","devolution","empowerment","transfer"],tip:"'Deli-gate' — you open the gate and send the task through to someone else."},
+  {w:"Stewardship",t:"noun",p:"/ˈstjuːərdʃɪp/",cat:"Leadership",d:"The responsible management and protection of something entrusted to one's care, whether resources, people, or a mission.",ex:["Her stewardship of the company's culture through rapid growth was recognized as a key driver of retention.","Environmental stewardship is now a boardroom issue, not just a CSR checkbox."],syn:["guardianship","custodianship","management","caretaking"],tip:"A steward on a ship keeps it safe on course — stewardship means you protect what's entrusted to you."},
+  {w:"Succession Planning",t:"noun",p:"/səkˈsɛʃən ˈplænɪŋ/",cat:"Leadership",d:"The process of identifying and developing internal talent to fill key leadership roles when they become vacant.",ex:["The lack of succession planning left the company vulnerable when the CFO resigned unexpectedly.","World-class organizations identify high-potential leaders three to five years before they need them."],syn:["leadership pipeline","talent development","continuity planning"],tip:"Success-ion — planning who 'succeeds' (follows) each leader before the need arises."},
+  {w:"Candor",t:"noun",p:"/ˈkændər/",cat:"Leadership",d:"The quality of being open, honest, and direct in communication, even when the truth is uncomfortable.",ex:["The managing director's candor during the earnings miss — acknowledging mistakes openly — rebuilt investor confidence.","Radical candor, as a management framework, encourages honest feedback delivered with genuine care."],syn:["frankness","openness","transparency","directness"],tip:"From Latin 'candidus' — white, pure. Candor is communication without any hidden coloring."},
+  {w:"Empowerment",t:"noun",p:"/ɪmˈpaʊərmənt/",cat:"Leadership",d:"The practice of giving employees the authority, tools, and confidence to make decisions and take ownership of their work.",ex:["Employee empowerment reduced decision-making bottlenecks and cut product launch time by six weeks.","True empowerment means managers trust their teams to fail, learn, and self-correct without micromanagement."],syn:["autonomy","enablement","authorization","ownership"],tip:"To empower = to give someone the POWER to act independently."},
+  {w:"Mentorship",t:"noun",p:"/ˈmɛntərʃɪp/",cat:"Leadership",d:"A developmental relationship in which an experienced person guides and supports a less-experienced individual's professional growth.",ex:["The mentorship program matched 200 junior analysts with senior leaders across the organization.","Effective mentorship accelerates career development far faster than formal training programs alone."],syn:["coaching","guidance","sponsorship","advising"],tip:"Mentor was a character in Greek mythology — the trusted advisor to Odysseus's son."},
+  {w:"Consensus",t:"noun",p:"/kənˈsɛnsəs/",cat:"Leadership",d:"A general agreement reached by a group through discussion and compromise, where all members can support the final decision.",ex:["Building consensus across three business units took weeks, but it ensured full buy-in for the restructuring.","Consensus decision-making is slower but produces more durable outcomes than top-down mandates."],syn:["agreement","unanimity","accord","alignment"],tip:"'Con-sensus' — to sense or feel together. Everyone feeling the same direction."},
+  {w:"Rhetoric",t:"noun",p:"/ˈrɛtərɪk/",cat:"Communication",d:"The art of effective, persuasive communication — using language skillfully to influence, motivate, or inform an audience.",ex:["Her opening keynote used powerful rhetoric that transformed a skeptical audience into enthusiastic advocates.","Leaders who master business rhetoric can align diverse stakeholders around a single compelling narrative."],syn:["oratory","eloquence","persuasion","discourse"],tip:"Aristotle taught rhetoric — the strategic use of ethos, pathos, and logos to persuade."},
+  {w:"Articulate",t:"adjective / verb",p:"/ɑːˈtɪkjʊlɪt/",cat:"Communication",d:"Able to express ideas clearly and effectively; or to express something clearly and coherently in speech or writing.",ex:["The most articulate candidate in the panel consistently outperformed peers who knew the material equally well.","Leaders must be able to articulate the company's mission in a way that resonates with every level of employee."],syn:["eloquent","clear","expressive","coherent"],tip:"Each joint in a skeleton is an 'article' — articulate speech connects ideas as joints connect bones."},
+  {w:"Facilitation",t:"noun",p:"/fəˌsɪlɪˈteɪʃən/",cat:"Communication",d:"The art of guiding a group through a discussion or process to reach an outcome, without directing the content.",ex:["Skilled facilitation of the offsite transformed a contentious group into a collaborative, focused team.","The consultant's role was facilitation — she didn't impose solutions, she helped the team find their own."],syn:["moderation","guidance","coordination","mediation"],tip:"'Facile' means easy — a facilitator makes hard group work easier to navigate."},
+  {w:"Debriefing",t:"noun",p:"/ˌdiːˈbriːfɪŋ/",cat:"Communication",d:"A structured review session held after a project, event, or experience to capture lessons learned and improve future performance.",ex:["The team's post-project debriefing identified three process gaps that were eliminated in the next sprint.","Military-inspired debriefing practices have become standard in high-performance business teams."],syn:["review","retrospective","post-mortem","after-action review"],tip:"Brief = short summary. Debriefing 'un-packs' the brief — opening it up after the fact."},
+  {w:"Synthesis",t:"noun",p:"/ˈsɪnθɪsɪs/",cat:"Communication",d:"The combination of diverse elements, data, or ideas into a coherent, unified whole.",ex:["Her board presentation was a masterful synthesis of three months of research into five actionable recommendations.","Good analysts gather data; great analysts synthesize it into insight that drives decisions."],syn:["integration","combination","consolidation","distillation"],tip:"Thesis + anti-thesis → synthesis. Three inputs become one unified conclusion."},
+  {w:"Persuasion",t:"noun",p:"/pəˈsweɪʒən/",cat:"Communication",d:"The process of influencing someone's beliefs, attitudes, or actions through argument, reasoning, or appeal.",ex:["The sales team's persuasion strategy focused on demonstrating ROI rather than product features.","Ethical persuasion builds on facts and genuine value — manipulation builds on deception."],syn:["influence","conviction","advocacy","inducement"],tip:"Per + suade (Latin: 'to advise sweetly'). Persuasion sweetens the argument until others adopt it."},
+  {w:"Mediation",t:"noun",p:"/ˌmiːdiˈeɪʃən/",cat:"Communication",d:"A structured process in which a neutral third party helps disputing parties reach a mutually acceptable resolution.",ex:["Commercial mediation resolved the contract dispute in two days, avoiding a costly 18-month litigation.","HR deployed mediation when a conflict between two department heads was escalating to affect team morale."],syn:["arbitration","conciliation","negotiation","dispute resolution"],tip:"A mediator stands in the 'middle' — they don't take sides, they bridge the gap."},
+  {w:"Stakeholder",t:"noun",p:"/ˈsteɪkhoʊldər/",cat:"Communication",d:"Any individual, group, or organization that has an interest in or is affected by a company's decisions and operations.",ex:["Before launching the restructuring plan, the CEO mapped all key stakeholders and communicated with each group individually.","Stakeholder management is a core competency for any leader navigating complex organizational change."],syn:["interested party","participant","contributor","affected party"],tip:"If someone has a 'stake' (bet, interest) in the outcome — they're a stakeholder."},
+  {w:"Procurement",t:"noun",p:"/prəˈkjʊərmənt/",cat:"Operations",d:"The process of sourcing, purchasing, and managing goods, services, and contracts needed for business operations.",ex:["Strategic procurement saved the manufacturer $4.2M annually by consolidating vendors and renegotiating terms.","Modern procurement extends beyond cost-cutting to include supplier relationship management and risk assessment."],syn:["purchasing","sourcing","acquisition","supply management"],tip:"'Pro-cure' = to secure/get what you need, before you need it."},
+  {w:"Throughput",t:"noun",p:"/ˈθruːpʊt/",cat:"Operations",d:"The amount of material, data, or work processed or produced by a system in a given period of time.",ex:["By eliminating one bottleneck in the assembly line, throughput increased by 18% with no additional headcount.","Customer service throughput — tickets resolved per agent per hour — is a key metric in support operations."],syn:["output","productivity","capacity","volume"],tip:"'Through' + 'put' — how much you can push through the system."},
+  {w:"Bottleneck",t:"noun",p:"/ˈbɒtəlˌnɛk/",cat:"Operations",d:"A point of congestion in a production or workflow process that reduces the overall system's capacity and speed.",ex:["The regulatory approval stage was the bottleneck that delayed every product launch by an average of three months.","Theory of Constraints teaches leaders to identify and eliminate the single biggest bottleneck to unlock system performance."],syn:["constraint","chokepoint","limitation","blockage"],tip:"Visualize a bottle — liquid can only flow as fast as the narrow neck allows."},
+  {w:"Lean",t:"adjective / noun",p:"/liːn/",cat:"Operations",d:"A methodology focused on maximizing value and eliminating waste in processes, originating from Toyota's production system.",ex:["The lean initiative reduced manufacturing defects by 62% and cut production cycle time in half.","Lean thinking applies as powerfully to service businesses and knowledge work as to factory floors."],syn:["efficient","streamlined","waste-free","optimized"],tip:"Lean = trim the fat. Only keep what directly creates value for the customer."},
+  {w:"KPI",t:"noun",p:"/ˌkeɪ piː ˈaɪ/",cat:"Operations",d:"Key Performance Indicator — a measurable value that demonstrates how effectively an organization is achieving its key objectives.",ex:["The marketing team's primary KPI was cost-per-acquisition, set at a maximum of $45 per customer.","Well-designed KPIs cascade from company-level goals down to individual contributors' daily metrics."],syn:["metric","benchmark","performance measure","indicator"],tip:"KPIs are the dials on your dashboard — they tell you at a glance if the business is healthy."},
+  {w:"ROI",t:"noun",p:"/ˌɑːr oʊ ˈaɪ/",cat:"Finance",d:"Return on Investment — a performance measure used to evaluate the efficiency or profitability of an investment.",ex:["The digital transformation initiative delivered a 340% ROI within 24 months of full deployment.","Every departmental budget request must include a projected ROI to justify the expenditure."],syn:["return","yield","profit ratio","payback"],tip:"ROI = (Gain − Cost) ÷ Cost × 100. The higher, the better your investment paid off."},
+  {w:"Onboarding",t:"noun",p:"/ˈɒnˌbɔːrdɪŋ/",cat:"HR",d:"The structured process of integrating a new employee or customer into an organization or product, maximizing early engagement.",ex:["A 90-day onboarding program cut new-hire turnover by 25% and reduced time-to-productivity by six weeks.","Customer onboarding that delivers early wins dramatically increases product retention and lifetime value."],syn:["orientation","integration","induction","enrollment"],tip:"Like getting on a ship — onboarding gets people oriented before the voyage begins."},
+  {w:"Attrition",t:"noun",p:"/əˈtrɪʃən/",cat:"HR",d:"The gradual reduction of a workforce or customer base through natural causes such as resignation, retirement, or churn — without active layoffs.",ex:["The company managed headcount reduction through natural attrition rather than disruptive redundancies.","Customer attrition above 5% per month signals a product-market fit problem that must be addressed urgently."],syn:["churn","turnover","reduction","erosion"],tip:"Like rubbing sandpaper on wood — attrition wears down the number gradually over time."},
+  {w:"Retention",t:"noun",p:"/rɪˈtɛnʃən/",cat:"HR",d:"The ability of an organization to keep its employees or customers over time, measured as a percentage.",ex:["The new flexible working policy improved employee retention from 74% to 91% in the first year.","Customer retention is five times cheaper than acquisition — a fact that drives investment in customer success."],syn:["keeping","loyalty","continuity","persistency"],tip:"Retention = 'retaining' what you already have. Much cheaper than replacing it."},
+  {w:"Incentivize",t:"verb",p:"/ɪnˈsɛntɪvaɪz/",cat:"HR",d:"To motivate behavior by offering a reward, benefit, or financial inducement.",ex:["The company incentivized early product adoption by offering a 30% lifetime discount to its first 1,000 customers.","Performance-linked bonuses incentivize individual achievement while team profit-sharing incentivizes collaboration."],syn:["motivate","encourage","reward","drive"],tip:"Incent-ivize — give an 'incentive' (a reason to act) by making the reward visible."},
+  {w:"Headcount",t:"noun",p:"/ˈhɛdˌkaʊnt/",cat:"HR",d:"The total number of people employed by an organization, or the number of positions allocated to a team or department.",ex:["The board approved an additional headcount of 45 engineers to accelerate the product roadmap.","Headcount planning for Q3 must account for both new hires and expected attrition."],syn:["staffing level","workforce size","personnel count","FTE"],tip:"Literally: counting heads. How many people are on your team today?"},
+  {w:"Redundancy",t:"noun",p:"/rɪˈdʌndənsi/",cat:"HR",d:"The situation where an employee's position is eliminated because the role is no longer needed — not performance-related.",ex:["The merger resulted in role redundancy across both finance teams, leading to a structured consolidation process.","Redundancy packages included three months' salary, career coaching, and extended healthcare coverage."],syn:["layoff","elimination","downsizing","restructuring"],tip:"A redundant thing is an extra copy — the role became an 'extra' the business no longer needed."},
+  {w:"Due Diligence",t:"noun",p:"/djuː ˈdɪlɪdʒəns/",cat:"Legal",d:"A comprehensive investigation and audit of a business, investment, or deal before it is finalized.",ex:["Six weeks of due diligence revealed undisclosed liabilities that reduced the acquisition price by 18%.","Investors conduct due diligence not just on financials but on culture, leadership, and operational risks."],syn:["investigation","vetting","audit","verification"],tip:"'Due' = owed, proper. 'Diligence' = careful attention. You owe it to yourself to investigate thoroughly."},
+  {w:"Indemnity",t:"noun",p:"/ɪnˈdɛmnɪti/",cat:"Legal",d:"A contractual obligation where one party agrees to compensate the other for specific losses or damages.",ex:["The software contract included an indemnity clause protecting the client from third-party IP infringement claims.","Directors and Officers insurance provides indemnity coverage against personal liability for corporate decisions."],syn:["compensation","protection","coverage","guarantee"],tip:"'In-demnity' — in = against, damnity = damage. Protection against being damaged."},
+  {w:"Liability",t:"noun",p:"/laɪəˈbɪlɪti/",cat:"Legal",d:"Legal or financial responsibility for one's actions or debts; also a financial obligation recorded on a balance sheet.",ex:["The product recall created significant liability exposure, requiring immediate engagement with the company's insurers.","Current liabilities — debts due within 12 months — are a critical indicator of short-term financial health."],syn:["obligation","responsibility","debt","exposure"],tip:"You're 'liable' (answerable) for your liabilities — what you owe or must answer for."},
+  {w:"Compliance",t:"noun",p:"/kəmˈplaɪəns/",cat:"Legal",d:"Adherence to laws, regulations, standards, and internal policies governing business operations.",ex:["The fintech company invested $3M in compliance infrastructure before launching in the EU market.","Compliance is not just a legal requirement — it's a competitive advantage that builds customer trust."],syn:["adherence","conformity","regulation","governance"],tip:"To comply = to follow. Compliance means following the rules completely and consistently."},
+  {w:"Non-disclosure Agreement",t:"noun",p:"/nɒn dɪsˈkloʊʒər əˈɡriːmənt/",cat:"Legal",d:"A legally binding contract that prevents parties from sharing confidential information with third parties.",ex:["All prospective acquirers signed NDAs before accessing the data room during the M&A process.","A well-drafted NDA clearly defines what constitutes confidential information and the duration of the obligation."],syn:["NDA","confidentiality agreement","secrecy agreement"],tip:"Non-disclosure = agreeing NOT to disclose. The secret stays in the room."},
+  {w:"Intellectual Property",t:"noun",p:"/ˌɪntəˈlɛktʃuəl ˈprɒpəti/",cat:"Legal",d:"Intangible creations of the mind — inventions, designs, brands, and artistic works — protected by law.",ex:["The company's IP portfolio, including 47 patents, was valued at $280M during the acquisition assessment.","Protecting intellectual property through trademarks and patents creates a durable competitive moat."],syn:["IP","patents","trademarks","copyrights","trade secrets"],tip:"Your brain's creations are 'property' too — the law treats them as assets you own."},
+  {w:"Innovation",t:"noun",p:"/ˌɪnəˈveɪʃən/",cat:"Innovation",d:"The process of translating a new idea, concept, or technology into a product or service that creates value.",ex:["Open innovation — inviting external partners to co-develop solutions — tripled the company's new product pipeline.","True innovation requires not just creative ideas but disciplined execution to bring them to market successfully."],syn:["invention","novelty","transformation","advancement"],tip:"'Innovate' comes from Latin 'innovare' — to renew or change. Make the new real."},
+  {w:"Disruption",t:"noun",p:"/dɪsˈrʌpʃən/",cat:"Innovation",d:"A radical transformation that displaces existing industries, technologies, or business models with fundamentally new approaches.",ex:["Ride-sharing caused massive disruption in the taxi industry by offering lower cost and better user experience.","Incumbents often dismiss disruptors as irrelevant until it's too late to respond effectively."],syn:["upheaval","transformation","revolution","displacement"],tip:"Dis-ruption = breaking the current 'rupture' in the pattern of how things work."},
+  {w:"Iteration",t:"noun",p:"/ˌɪtəˈreɪʃən/",cat:"Innovation",d:"A single cycle of a development process; repeated cycles of improvement based on feedback and testing.",ex:["After five iterations, the prototype evolved from a rough concept to a product customers loved.","Rapid iteration is the engine of modern product development — fail fast, learn faster, improve continuously."],syn:["version","cycle","revision","refinement"],tip:"'Iterate' = to do again and again. Each loop improves on the last."},
+  {w:"Prototype",t:"noun",p:"/ˈproʊtəˌtaɪp/",cat:"Innovation",d:"An early sample or model built to test a concept, design, or process before full-scale development.",ex:["The engineering team built a working prototype in three weeks to validate the concept with real users.","A prototype doesn't need to be perfect — its purpose is to provoke the right feedback quickly."],syn:["mock-up","model","pilot","proof of concept"],tip:"'Proto' = first, 'type' = form. A prototype is the first physical form of an idea."},
+  {w:"Minimum Viable Product",t:"noun",p:"/ˌmɪnɪməm ˈvaɪəbəl ˈprɒdʌkt/",cat:"Innovation",d:"The simplest version of a product that delivers enough value to attract early users and validate core assumptions.",ex:["Their MVP was a spreadsheet and email automation — it proved demand before a single line of code was written.","Building an MVP forces founders to identify what's truly essential versus what's merely nice-to-have."],syn:["MVP","beta product","pilot version","proof of concept"],tip:"Minimum → as simple as possible. Viable → still delivers real value. The rest comes later."},
+  {w:"Acquisition",t:"noun",p:"/ˌækwɪˈzɪʃən/",cat:"Strategy",d:"The purchase of one company or asset by another, used to accelerate growth, enter new markets, or eliminate competition.",ex:["The $2.3B acquisition of a cloud analytics firm accelerated the company's enterprise product roadmap by four years.","Customer acquisition cost (CAC) is the marketing equivalent — how much you spend to win one new customer."],syn:["takeover","purchase","buyout","merger"],tip:"To acquire = to gain. In M&A, you gain a whole company."},
+  {w:"Merger",t:"noun",p:"/ˈmɜːrdʒər/",cat:"Strategy",d:"The combination of two separate companies into a single new legal entity, typically with shared ownership.",ex:["The merger of the two regional banks created the third-largest financial institution in the country.","Post-merger integration is where most M&A value is won or lost — the deal announcement is just the beginning."],syn:["consolidation","combination","union","amalgamation"],tip:"Two rivers 'merge' into one — two companies merge into one larger entity."},
+  {w:"Organic Growth",t:"noun",p:"/ɔːˈɡænɪk ɡrəʊθ/",cat:"Strategy",d:"Business expansion achieved through internal efforts — increasing sales, customers, or output — rather than acquisitions.",ex:["The CEO prioritized organic growth over acquisitions, investing in product innovation and sales team expansion.","Organic growth is slower but more sustainable, as it builds genuine customer demand rather than buying it."],syn:["internal growth","natural growth","self-generated growth"],tip:"Like a plant growing from its own roots — no external grafting or acquisitions required."},
+  {w:"Go-to-Market",t:"noun",p:"/ɡoʊ tuː ˈmɑːrkɪt/",cat:"Marketing",d:"A strategic plan that outlines how a company will launch a product, reach target customers, and achieve competitive advantage.",ex:["The go-to-market strategy centered on a partner channel model to achieve scale without building a direct sales force.","A poorly executed go-to-market can cause even a great product to fail commercially in its first year."],syn:["launch strategy","market entry plan","commercialization plan"],tip:"It's the entire plan for how your product goes 'from the company' to 'the market'."},
+  {w:"Customer Lifetime Value",t:"noun",p:"/ˈkʌstəmər ˈlaɪftaɪm ˈvæljuː/",cat:"Marketing",d:"The total revenue a business can expect to earn from a single customer over the entire duration of their relationship.",ex:["By increasing CLV through loyalty programs and upselling, the company doubled revenue without acquiring new customers.","Understanding CLV helps businesses determine how much they can profitably spend to acquire a new customer."],syn:["CLV","LTV","customer value","lifetime revenue"],tip:"Think of each customer as a plant — CLV is the total fruit it will bear over its lifetime."},
+  {w:"Segmentation",t:"noun",p:"/ˌsɛɡmɛnˈteɪʃən/",cat:"Marketing",d:"The process of dividing a market into distinct groups of buyers with similar needs, characteristics, or behaviors.",ex:["Behavioral segmentation revealed that power users — just 8% of the base — generated 61% of total revenue.","Without precise segmentation, marketing spend is wasted reaching people who will never convert."],syn:["categorization","targeting","classification","profiling"],tip:"A market segment is a 'slice' of a larger pie — each slice has different tastes."},
+  {w:"Brand Equity",t:"noun",p:"/brænd ˈɛkwɪti/",cat:"Marketing",d:"The commercial value derived from consumer perception of a brand, rather than just the product or service itself.",ex:["Apple's extraordinary brand equity allows it to command a 30–40% price premium over comparable hardware.","Negative brand equity occurs when a company's reputation actively destroys sales — as happened after the data breach."],syn:["brand value","brand perception","brand strength","goodwill"],tip:"Brand equity is the 'bonus value' customers pay because they trust and prefer your brand."},
+  {w:"Conversion Rate",t:"noun",p:"/kənˈvɜːrʒən reɪt/",cat:"Marketing",d:"The percentage of users or prospects who complete a desired action, such as making a purchase or signing up.",ex:["A/B testing the landing page headline improved conversion rate from 2.1% to 4.8% — a 129% improvement.","Conversion rate optimization (CRO) can double revenue without increasing advertising spend."],syn:["take-up rate","success rate","close rate","completion rate"],tip:"Conversion = transforming a visitor into a customer. Rate = how often that transformation happens."},
+  {w:"Churn",t:"noun",p:"/tʃɜːrn/",cat:"Marketing",d:"The rate at which customers stop using a product or service, expressed as a percentage over a given time period.",ex:["Monthly churn above 3% signals product-market fit problems that acquisition spending cannot sustainably mask.","The SaaS company reduced annual churn from 18% to 7% by implementing proactive customer success protocols."],syn:["attrition","cancellation rate","customer loss","defection"],tip:"Churn = the churning (agitation) of customers in and out. High churn = a leaking bucket."},
+  {w:"Pipeline",t:"noun",p:"/ˈpaɪpˌlaɪn/",cat:"Marketing",d:"The total value of potential deals or prospects at various stages of the sales process.",ex:["The sales team needed a $12M pipeline to achieve its $3M quarterly target at a 25% close rate.","Pipeline hygiene — removing stale, unlikely deals — is critical for accurate revenue forecasting."],syn:["deal flow","sales funnel","opportunity set","prospect pool"],tip:"Imagine a physical pipe — deals flow in one end and (hopefully) emerge as revenue at the other."},
+  {w:"Upselling",t:"noun",p:"/ˈʌpˌsɛlɪŋ/",cat:"Marketing",d:"Encouraging an existing customer to purchase a higher-value product, upgrade, or add-on to what they already have.",ex:["Upselling to the annual plan reduced churn by 40% and increased average revenue per user by 65%.","Effective upselling presents the upgrade as a solution to a pain the customer already has — not a sales pitch."],syn:["upgrading","premium selling","add-on selling","tier upgrade"],tip:"You're selling 'up' — moving the customer to a higher value option."},
+  {w:"Cross-selling",t:"noun",p:"/ˈkrɒs ˌsɛlɪŋ/",cat:"Marketing",d:"The practice of selling complementary products or services to an existing customer.",ex:["Amazon's 'customers also bought' engine drives 35% of total revenue through intelligent cross-selling.","Banks cross-sell credit cards, mortgages, and investment accounts to existing current account holders."],syn:["complementary selling","bundle selling","add-on sales"],tip:"Cross = across. You cross to a different product category to serve the same customer more completely."},
+  {w:"Net Promoter Score",t:"noun",p:"/nɛt prəˈmoʊtər skɔːr/",cat:"Marketing",d:"A customer loyalty metric based on one question: 'How likely are you to recommend us?' Scored from -100 to +100.",ex:["The company's NPS jumped from 23 to 67 after overhauling its customer support response time.","NPS above 50 is considered excellent; above 70 puts you in world-class territory alongside Apple and Netflix."],syn:["NPS","customer loyalty score","advocacy score","satisfaction metric"],tip:"Promoters minus Detractors = NPS. Are your fans outweighing your critics?"},
+  {w:"Runway",t:"noun",p:"/ˈrʌnˌweɪ/",cat:"Finance",d:"The amount of time a company can continue operating before it runs out of cash, given its current burn rate.",ex:["After the Series A closed, the startup had 22 months of runway to achieve product-market fit.","As runway dropped below six months, the CEO shifted focus from growth to reducing monthly burn rate."],syn:["operating window","cash life","financial horizon"],tip:"Like an airplane runway — how long the strip is before you must be airborne (profitable) or crash."},
+  {w:"Burn Rate",t:"noun",p:"/bɜːrn reɪt/",cat:"Finance",d:"The rate at which a company spends its cash reserves before generating positive cash flow.",ex:["With a $400K monthly burn rate and $3.2M in the bank, the team had exactly eight months of runway.","Gross burn measures total spending; net burn subtracts revenue — both matter for financial planning."],syn:["cash consumption","spend rate","monthly expenditure"],tip:"Money 'burns' through your account — burn rate measures how quickly the fire consumes your reserves."},
+  {w:"Valuation",t:"noun",p:"/ˌvæljuˈeɪʃən/",cat:"Finance",d:"The analytical process of determining the current worth of a company, asset, or investment.",ex:["The startup's $50M Series B valuation was based on a 15x multiple of annualized recurring revenue.","Valuation methodologies include DCF analysis, comparable company analysis, and precedent transactions."],syn:["worth","appraisal","assessment","pricing"],tip:"Valuation = putting a number on how 'valuable' something is — not easy, always debated."},
+  {w:"Bootstrapping",t:"noun",p:"/ˈbuːtˌstræpɪŋ/",cat:"Finance",d:"Building and growing a business using only personal savings and operating revenues, without external investment.",ex:["The founder bootstrapped the company to $2M ARR before accepting her first external investment on her own terms.","Bootstrapped companies are often more capital-efficient because every dollar spent is the founder's own."],syn:["self-funding","organic financing","independence","self-sustaining"],tip:"'Pull yourself up by your own bootstraps' — grow using only your own resources and revenue."},
+  {w:"Capitalization",t:"noun",p:"/ˌkæpɪtəlɪˈzeɪʃən/",cat:"Finance",d:"The total value of a company's outstanding shares; or the accounting treatment of an expenditure as a long-term asset rather than an immediate expense.",ex:["The company's market capitalization crossed $1 billion following the announcement of its strategic partnership.","Capitalizing software development costs spreads the expense over its useful life instead of hitting it all at once."],syn:["market cap","funding","asset recording"],tip:"Capital-ization = the total 'capital' size of the company, as the market sees it."},
+  {w:"Profitability",t:"noun",p:"/ˌprɒfɪtəˈbɪlɪti/",cat:"Finance",d:"The degree to which a business generates profit relative to its revenues, assets, or equity.",ex:["Gross profitability improved 8 percentage points after renegotiating supplier contracts and reducing waste.","Unit economics — profitability at the individual product or customer level — must be understood before scaling."],syn:["profit margin","financial performance","earnings power"],tip:"Profitable = making more than you spend. Profitability measures HOW MUCH more."},
+  {w:"Working Capital",t:"noun",p:"/ˈwɜːrkɪŋ ˈkæpɪtəl/",cat:"Finance",d:"The difference between a company's current assets and current liabilities — the capital available for day-to-day operations.",ex:["Slow-paying customers were squeezing working capital, forcing the company to draw on its credit facility.","Positive working capital means you can cover short-term obligations; negative working capital signals a cash crisis."],syn:["operating capital","net current assets","operational liquidity"],tip:"The capital that 'works' daily — keeping the lights on, paying suppliers, and funding operations."},
+  {w:"Forecasting",t:"noun",p:"/ˈfɔːrkæstɪŋ/",cat:"Operations",d:"The process of making predictions about future business performance based on historical data, trends, and assumptions.",ex:["Rolling 13-week cash flow forecasting gave the CFO early warning of a seasonal liquidity crunch.","Accurate sales forecasting improves inventory management, hiring decisions, and manufacturing planning."],syn:["projection","prediction","planning","estimation"],tip:"A weather forecast predicts tomorrow's weather. Business forecasting predicts tomorrow's revenues."},
+  {w:"Outsourcing",t:"noun",p:"/ˈaʊtˌsɔːrsɪŋ/",cat:"Operations",d:"The practice of contracting external organizations to perform functions or services that could be done internally.",ex:["The company outsourced tier-1 customer support to a specialist BPO, reducing costs by 55%.","Nearshore outsourcing — to neighboring countries with overlapping time zones — balances cost and collaboration."],syn:["contracting out","offshoring","third-party delivery","subcontracting"],tip:"You go 'out' to a 'source' — finding external expertise instead of building it in-house."},
+  {w:"Bandwidth",t:"noun",p:"/ˈbændˌwɪdθ/",cat:"Operations",d:"In business contexts, the capacity of a person or team to handle work or take on additional responsibilities.",ex:["Before assigning the new initiative, she checked whether her team had the bandwidth to execute without compromising current priorities.","'We don't have the bandwidth' has become a standard executive phrase for 'our team is already fully deployed'."],syn:["capacity","time","availability","resource"],tip:"In technology, bandwidth = data capacity. In business, it's your human capacity to process more work."},
+  {w:"Synergy",t:"noun",p:"/ˈsɪnərˌdʒi/",cat:"Strategy",d:"The combined effect of two entities working together, producing a result greater than the sum of their individual contributions.",ex:["The merger promised $180M in annual synergies through shared infrastructure and combined purchasing power.","Real synergies are rarer than projected ones — most M&A teams overestimate integration savings by 40%."],syn:["combined effect","collaboration benefit","integration value","complementarity"],tip:"'Syn' = together. Synergy is 1+1=3 — together you achieve more than separately."},
+  {w:"Scalable",t:"adjective",p:"/ˈskeɪləbəl/",cat:"Strategy",d:"Describing a business model, system, or process that can handle growth efficiently without proportional increases in cost.",ex:["A scalable pricing model lets you grow from 100 to 10,000 customers without rebuilding the entire system.","Investors evaluate whether a startup's customer acquisition and delivery model is truly scalable before committing capital."],syn:["expandable","extensible","growable","elastic"],tip:"Scale-able = able to be scaled up. Growth comes without breaking the system."},
+  {w:"Stakeholder Alignment",t:"noun",p:"/ˈsteɪkhoʊldər əˈlaɪnmənt/",cat:"Leadership",d:"The process of ensuring all key parties share a common understanding, direction, and commitment to a plan or decision.",ex:["Stakeholder alignment sessions before the system launch prevented expensive mid-project course corrections.","The project failed not from poor execution but from insufficient stakeholder alignment at the outset."],syn:["buy-in","consensus","agreement","unified direction"],tip:"Alignment = all arrows pointing the same way. Misalignment = arrows pointing in all directions."},
+  {w:"Turnaround",t:"noun",p:"/ˈtɜːrn.ə.raʊnd/",cat:"Strategy",d:"A significant recovery in the performance of a company or economy after a period of decline or difficulty.",ex:["The new CEO engineered a remarkable turnaround, taking the company from near-bankruptcy to profitability in 18 months.","Operational turnarounds require cutting waste immediately while simultaneously building the capabilities for sustainable growth."],syn:["recovery","reversal","transformation","restructuring"],tip:"Literally turning a direction around — from downward to upward."},
+  {w:"Velocity",t:"noun",p:"/vəˈlɒsɪti/",cat:"Operations",d:"The speed and direction at which something moves — in business, often the rate at which sales, deals, or projects progress.",ex:["Sales velocity — the rate at which deals move through the pipeline — doubled after implementing structured discovery calls.","Agile teams measure sprint velocity to predict future capacity and maintain realistic delivery commitments."],syn:["speed","momentum","pace","rate"],tip:"Physics term adopted by business: how fast and in what direction are things moving?"},
+  {w:"Ecosystem",t:"noun",p:"/ˈiːkoʊˌsɪstəm/",cat:"Strategy",d:"A network of interconnected companies, products, and services that create value for each other and shared customers.",ex:["Apple's ecosystem — hardware, software, and services — creates powerful lock-in that competitors struggle to replicate.","Platform businesses win by building ecosystems where third-party partners extend the core product's value."],syn:["platform","network","community","value network"],tip:"Like a biological ecosystem — every organism plays a role and the whole is greater than its parts."},
+  {w:"Franchise",t:"noun",p:"/ˈfræntʃaɪz/",cat:"Strategy",d:"A licensed business model where one party (franchisee) operates under the brand, systems, and support of another (franchisor).",ex:["The brand scaled to 1,200 locations in five years by adopting a franchise model instead of corporate-owned stores.","Strong franchise operations manuals and training systems are what make or break franchise consistency."],syn:["license","chain","network","branded operation"],tip:"A franchise gives you the right to operate someone else's proven system under their name."},
+  {w:"Capacity Planning",t:"noun",p:"/kəˈpæsɪti ˈplænɪŋ/",cat:"Operations",d:"The process of determining the production or service capacity an organization needs to meet future demand.",ex:["Capacity planning for the holiday season began in August to ensure staffing and inventory were sufficient.","Data center capacity planning requires accurate growth projections to avoid both over-provisioning and outages."],syn:["resource planning","supply planning","workforce planning"],tip:"How much can you produce? Capacity planning answers that before demand arrives."},
+  {w:"Reconciliation",t:"noun",p:"/ˌrɛkənsɪliˈeɪʃən/",cat:"Finance",d:"The process of comparing two sets of records to ensure they agree — commonly used in accounting to verify financial accuracy.",ex:["Monthly bank reconciliation caught a $12,000 discrepancy caused by an unauthorized vendor payment.","Account reconciliation is a core internal control that prevents fraud and ensures financial statement accuracy."],syn:["matching","verification","balancing","audit"],tip:"Two parties coming back into agreement — like reconciling with an old friend after a dispute."},
+  {w:"Margin",t:"noun",p:"/ˈmɑːrdʒɪn/",cat:"Finance",d:"The difference between selling price and cost, expressed as a percentage — a fundamental measure of profitability.",ex:["By shifting from hardware sales to software subscriptions, gross margins improved from 28% to 74%.","Pricing strategy must always account for margin: high volume at thin margins can be less valuable than moderate volume at healthy margins."],syn:["profit margin","markup","spread","profitability"],tip:"The margin is the space between revenue and cost — the bigger that space, the healthier the business."},
+  {w:"Portfolio",t:"noun",p:"/pɔːrtˈfoʊlioʊ/",cat:"Finance",d:"A collection of investments, products, projects, or clients managed together — diversified to balance risk and return.",ex:["The investment portfolio was rebalanced quarterly to maintain the target allocation across asset classes.","The product portfolio review eliminated three underperforming lines to focus resources on high-margin categories."],syn:["collection","holdings","mix","basket"],tip:"Originally: a folder of artworks. Now: any collection of assets managed together."},
+  {w:"Proactive",t:"adjective",p:"/proʊˈæktɪv/",cat:"Leadership",d:"Taking initiative to anticipate and prevent problems or create opportunities, rather than simply reacting to events.",ex:["The proactive risk assessment team identified supply chain vulnerabilities six months before competitors recognized the issue.","Proactive customer success — reaching out before problems occur — reduces churn more effectively than reactive support."],syn:["initiative-taking","anticipatory","forward-thinking","preventive"],tip:"Pro + active. 'Pro' = before. Acting BEFORE events happen, not after."},
+  {w:"Accountability Framework",t:"noun",p:"/əˌkaʊntəˈbɪlɪti ˈfreɪmwɜːrk/",cat:"Leadership",d:"A structured system that defines roles, responsibilities, metrics, and consequences to ensure people are answerable for outcomes.",ex:["The accountability framework clarified who owned each initiative and eliminated the 'everyone's responsible, no one's responsible' problem.","RACI charts are a popular accountability framework that assigns Responsible, Accountable, Consulted, and Informed roles."],syn:["governance structure","responsibility matrix","RACI","accountability system"],tip:"A framework = a structure. An accountability framework builds the structure that holds people to their commitments."},
+  {w:"Autonomy",t:"noun",p:"/ɔːˈtɒnəmi/",cat:"Leadership",d:"The degree of independence and self-governance granted to individuals or teams in how they execute their work.",ex:["Granting engineering teams full autonomy over technical decisions accelerated shipping velocity by 40%.","High autonomy cultures attract top talent but require strong alignment on goals and values to prevent fragmentation."],syn:["independence","self-governance","freedom","empowerment"],tip:"'Auto' = self, 'nomos' = law. Autonomy = making your own rules within agreed boundaries."},
+  {w:"Transparency",t:"noun",p:"/trænsˈpærənsi/",cat:"Leadership",d:"The practice of openly sharing information, decisions, and reasoning across an organization, fostering trust and informed action.",ex:["Radical transparency — sharing financials with all employees — created alignment and dramatically improved cost consciousness.","Investor relations requires careful transparency: disclosing material information fairly and consistently."],syn:["openness","candor","visibility","disclosure"],tip:"Transparent = see-through. Transparency lets people see clearly what's happening and why."},
+  {w:"Scalability",t:"noun",p:"/ˌskeɪləˈbɪlɪti/",cat:"Innovation",d:"The ability of a system, process, or business to handle increasing demand without requiring proportional resource increases.",ex:["Cloud infrastructure offers near-infinite scalability, allowing SaaS companies to grow without capital-intensive hardware.","Building for scalability from day one is expensive; building for it after you need it is even more so."],syn:["growth capacity","extensibility","expandability"],tip:"A ladder is scalable — you add rungs, it stays a ladder. A step stool is not — it has a fixed height."},
+  {w:"First-mover Advantage",t:"noun",p:"/fɜːrst ˈmuːvər ədˈvɑːntɪdʒ/",cat:"Strategy",d:"The competitive edge gained by being the first company to enter a new market or adopt a new technology.",ex:["Amazon's first-mover advantage in e-commerce gave it 15 years of data and scale competitors couldn't replicate.","First-mover advantage is not always decisive — fast followers who learn from pioneers' mistakes often win in the long run."],syn:["pioneer advantage","early entrant advantage","head start"],tip:"The first chess piece moved controls the center — first movers control the market's narrative."},
+  {w:"Network Effect",t:"noun",p:"/ˈnɛtwɜːrk ɪˈfɛkt/",cat:"Strategy",d:"A phenomenon where a product or service becomes more valuable as more people use it.",ex:["LinkedIn's network effect creates a self-reinforcing cycle: more professionals → more value → even more professionals.","Marketplace businesses rely on network effects — buyers attract sellers, sellers attract buyers."],syn:["Metcalfe's law","viral growth","platform effect"],tip:"A telephone is useless alone. With one other user it has one connection. With 1M users, millions of connections."},
+  {w:"Disintermediation",t:"noun",p:"/ˌdɪsɪntəˌmiːdiˈeɪʃən/",cat:"Strategy",d:"The removal of intermediaries from a supply chain or sales channel so companies sell directly to end customers.",ex:["Warby Parker's disintermediation of the eyewear supply chain allowed it to sell premium glasses at a 50% discount.","Digital platforms enable disintermediation in industries from real estate to banking to travel booking."],syn:["direct-to-consumer","bypassing middlemen","channel elimination"],tip:"Dis + intermediary. Removing the 'middle man' to connect producer and consumer directly."},
+  {w:"Vertical Integration",t:"noun",p:"/ˈvɜːrtɪkəl ˌɪntɪˈɡreɪʃən/",cat:"Strategy",d:"A strategy where a company expands into different stages of its production or distribution process.",ex:["Apple's vertical integration — designing its own chips, software, and retail — gives it unmatched quality control.","Vertical integration reduces dependence on third parties but requires significant capital and operational expertise."],syn:["supply chain control","in-house production","backward integration","forward integration"],tip:"Going 'vertical' up or down the supply chain — owning more of the process yourself."},
+  {w:"Horizontal Integration",t:"noun",p:"/ˌhɒrɪˈzɒntəl ˌɪntɪˈɡreɪʃən/",cat:"Strategy",d:"The acquisition of competitors or similar businesses at the same level of the supply chain to gain market share.",ex:["Facebook's horizontal integration strategy — acquiring Instagram and WhatsApp — consolidated the social media landscape.","Horizontal integration creates market power but often faces antitrust scrutiny from regulators."],syn:["market consolidation","competitor acquisition","industry rollup"],tip:"Going 'horizontal' across the market — buying competitors who do the same thing you do."},
+  {w:"Market Share",t:"noun",p:"/ˈmɑːrkɪt ʃɛr/",cat:"Marketing",d:"The percentage of total sales in a market captured by one company, relative to all competitors.",ex:["The brand grew market share from 11% to 19% in two years by targeting an underserved demographic.","Protecting market share from well-funded new entrants requires continuous product innovation and pricing discipline."],syn:["market position","share of wallet","competitive standing"],tip:"The market is one pie — market share is your slice of it."},
+  {w:"Omnichannel",t:"noun / adjective",p:"/ˈɒmniˌtʃænəl/",cat:"Marketing",d:"A seamlessly integrated customer experience across all channels — physical stores, websites, mobile apps, and customer service.",ex:["The retailer's omnichannel strategy allowed customers to buy online and return in-store, driving footfall and convenience.","Omnichannel personalization — same recommendations and history across every touchpoint — dramatically improves conversion."],syn:["multichannel","cross-channel","integrated retail","unified commerce"],tip:"'Omni' = all. All channels, one seamless experience — the customer shouldn't see the seams."},
+  {w:"Performance Management",t:"noun",p:"/pəˈfɔːrmən mænɪdʒmənt/",cat:"HR",d:"The continuous process of setting objectives, monitoring performance, providing feedback, and developing employee capabilities.",ex:["The new performance management system replaced annual reviews with continuous feedback cycles and quarterly goal resets.","Effective performance management aligns individual goals with organizational strategy while developing long-term talent."],syn:["talent management","appraisal system","goal management","evaluation"],tip:"Managing = controlling. Performance management controls how well people perform by guiding, not just judging."},
+  {w:"Organizational Culture",t:"noun",p:"/ˌɔːɡənɪˈzeɪʃənəl ˈkʌltʃər/",cat:"HR",d:"The shared values, beliefs, behaviors, and practices that define how work gets done within an organization.",ex:["A culture of psychological safety — where employees feel safe to speak up — was the firm's strongest competitive advantage.","Culture doesn't change through posters or slogans; it changes through leadership behavior modeled consistently over time."],syn:["company culture","organizational DNA","corporate values","workplace ethos"],tip:"Culture = how we actually behave when no one's looking. Not what's on the wall — what's in the room."},
+  {w:"Succession",t:"noun",p:"/səkˈsɛʃən/",cat:"HR",d:"The process or order by which one person or group takes over from another in a role, especially leadership positions.",ex:["The well-managed succession from the founder to a professional CEO was credited with maintaining investor confidence.","Succession planning should identify and prepare at least two internal candidates for every critical leadership role."],syn:["handover","transition","leadership pipeline","continuity"],tip:"Each king is 'succeeded' by the next. Business succession ensures no throne goes empty."},
+  {w:"Governance",t:"noun",p:"/ˈɡʌvənəns/",cat:"Legal",d:"The system of rules, practices, and processes by which an organization is directed and controlled.",ex:["Strong corporate governance — independent board oversight and transparent reporting — lowered the company's cost of capital.","ESG investing evaluates environmental, social, and governance factors alongside traditional financial metrics."],syn:["oversight","control","management structure","stewardship"],tip:"'Govern' = to rule. Governance defines the rules and structures by which the organization rules itself."},
+  {w:"Regulatory",t:"adjective",p:"/ˌrɛɡjʊˈleɪtəri/",cat:"Legal",d:"Relating to official rules or oversight designed to control an industry or activity in the public interest.",ex:["The fintech startup hired a regulatory specialist before entering the EU market to navigate complex compliance requirements.","Regulatory changes to data privacy laws required a full audit of the company's customer data practices."],syn:["compliance-related","legislative","oversight","statutory"],tip:"Regulators 'regulate' — they set the speed limits your business must drive within."},
+  {w:"Arbitration",t:"noun",p:"/ˌɑːrbɪˈtreɪʃən/",cat:"Legal",d:"A private dispute resolution process where an independent arbitrator hears both sides and makes a binding decision.",ex:["The employment contract required arbitration for all disputes, preventing costly public litigation.","Mandatory arbitration clauses have become standard in B2B contracts to reduce legal costs and maintain confidentiality."],syn:["dispute resolution","adjudication","mediation","alternative dispute resolution"],tip:"An 'arbiter' is a judge. Arbitration is private judging — keeping disputes out of public courts."},
+  {w:"Contractual Obligation",t:"noun",p:"/kənˈtræktʃuəl ˌɒblɪˈɡeɪʃən/",cat:"Legal",d:"A legally enforceable duty arising from the terms of a signed agreement between two or more parties.",ex:["Failing to deliver within the 30-day window triggered a contractual obligation to pay a 2% penalty on the invoice.","Understanding contractual obligations before signing is why legal review of commercial agreements is essential."],syn:["legal duty","binding commitment","agreed requirement","enforceable term"],tip:"You 'contracted' (agreed) to do something — now you're 'obligated' (must do) it."},
+  {w:"Entrepreneur",t:"noun",p:"/ˌɒntrəprəˈnɜːr/",cat:"Innovation",d:"An individual who creates, organizes, and operates a business, taking on financial risk in pursuit of opportunity and value creation.",ex:["The entrepreneur identified a market gap, raised seed funding, and built a profitable business within 24 months.","Entrepreneurship is not just about startups — intrapreneurs drive innovation within large corporations too."],syn:["founder","innovator","business creator","self-starter"],tip:"From French 'entreprendre' — to undertake. An entrepreneur undertakes the challenge of building something new."},
+  {w:"Intrapreneurship",t:"noun",p:"/ˌɪntrəˈprɜːnərʃɪp/",cat:"Innovation",d:"Acting with entrepreneurial initiative and creativity within an established organization to drive innovation and create new value.",ex:["Google's 20% time policy is a famous intrapreneurship program — it produced Gmail and Google Maps.","Intrapreneurship channels the startup mindset into large organizations to prevent creative stagnation."],syn:["corporate entrepreneurship","internal innovation","venture thinking"],tip:"Intra = inside. Intrapreneurship = entrepreneurship inside (within) an existing company."},
+  {w:"Digital Transformation",t:"noun",p:"/ˈdɪdʒɪtəl trænsˌfɔːrˈmeɪʃən/",cat:"Innovation",d:"The integration of digital technology into all areas of a business, fundamentally changing operations and delivering new customer value.",ex:["The retailer's digital transformation — moving from paper catalogs to AI-personalized e-commerce — tripled online revenue.","Digital transformation is not about technology; it's about using technology to reimagine the customer experience."],syn:["digitization","tech transformation","modernization","digital overhaul"],tip:"Not just going online — transforming HOW and WHY you serve customers using digital tools."},
+  {w:"Artificial Intelligence",t:"noun",p:"/ˌɑːrtɪˈfɪʃəl ɪnˈtɛlɪdʒəns/",cat:"Innovation",d:"Technology that enables machines to perform tasks that typically require human intelligence, such as reasoning, learning, and problem-solving.",ex:["The company deployed AI-powered demand forecasting that reduced inventory carrying costs by 31%.","Leaders who understand AI's limitations — not just its capabilities — make better technology investment decisions."],syn:["AI","machine learning","automation","intelligent systems"],tip:"Artificial (man-made) intelligence: machines that mimic human thinking, trained on vast amounts of data."},
+  {w:"SaaS",t:"noun",p:"/sæs/",cat:"Innovation",d:"Software as a Service — a software delivery model where applications are hosted in the cloud and accessed via subscription.",ex:["The pivot from perpetual licenses to SaaS recurring revenue transformed the company's financial predictability.","SaaS metrics — ARR, churn, NPS, and CAC — are the language of modern software business evaluation."],syn:["cloud software","subscription software","hosted software","web-based software"],tip:"You don't buy the software — you subscribe to it, like a streaming service for business tools."},
+  {w:"Automation",t:"noun",p:"/ˌɔːtəˈmeɪʃən/",cat:"Innovation",d:"The use of technology to perform tasks with minimal human intervention, improving speed, consistency, and efficiency.",ex:["Accounts payable automation reduced processing time from 7 days to 4 hours and eliminated 90% of manual errors.","Automation creates the most value when applied to repetitive, high-volume, rule-based tasks."],syn:["mechanization","computerization","self-operation","robotic process"],tip:"Auto = self. Automation makes processes run themselves without constant human input."},
+  {w:"Agility",t:"noun",p:"/əˈdʒɪlɪti/",cat:"Leadership",d:"The organizational ability to move quickly, adapt to change, and respond effectively to market shifts or disruptions.",ex:["The startup's agility — pivoting product strategy in three weeks — gave it a decisive advantage over slower incumbents.","Organizational agility requires both structural flexibility and a culture that tolerates and learns from rapid experimentation."],syn:["adaptability","flexibility","responsiveness","nimbleness"],tip:"Like a gymnast — agility means moving fast and changing direction without losing balance."},
+  {w:"Strategic Planning",t:"noun",p:"/strəˈtiːdʒɪk ˈplænɪŋ/",cat:"Strategy",d:"The disciplined process of defining an organization's direction, allocating resources, and setting priorities to achieve long-term goals.",ex:["The annual strategic planning offsite produced a three-year roadmap with clear milestones and resource commitments.","Strategic planning without execution is just strategy theater — the plan must translate into weekly operational decisions."],syn:["long-term planning","strategy development","corporate planning"],tip:"Strategy = 'stratos' (army) + 'agein' (to lead). Strategic planning is deciding HOW to lead the army to victory."},
+  {w:"Profit Margin",t:"noun",p:"/ˈprɒfɪt ˈmɑːrdʒɪn/",cat:"Finance",d:"The percentage of revenue that remains as profit after deducting all costs — a key measure of financial efficiency.",ex:["Gross margin improved from 42% to 58% after moving manufacturing from Europe to Southeast Asia.","Net profit margin — revenue minus all costs — is the ultimate measure of how much money the company actually keeps."],syn:["net margin","profitability ratio","return on sales","earnings margin"],tip:"Revenue - Costs = Profit. Profit ÷ Revenue = Margin. It's your kept percentage of every rupee earned."},
+  {w:"Yield",t:"noun",p:"/jiːld/",cat:"Finance",d:"The income generated from an investment, expressed as a percentage of the investment's cost or market value.",ex:["The bond portfolio generated an average yield of 6.8%, providing stable income in a volatile equity market.","Dividend yield — annual dividend divided by share price — helps income investors compare different equity investments."],syn:["return","income","earnings","interest rate"],tip:"Like a crop yield — how much your investment 'harvest' produces relative to what you 'planted'."},
+  {w:"Benchmark",t:"noun / verb",p:"/ˈbɛntʃmɑːrk/",cat:"Operations",d:"A standard or reference point used to evaluate performance, compare results, or set targets.",ex:["Industry benchmarks showed the company's customer acquisition cost was 2.3x the category average — a clear warning signal.","The quarterly benchmark review identified three processes where the team's performance ranked in the bottom quartile."],syn:["standard","reference point","yardstick","baseline"],tip:"Surveyors carved marks into benches (rock) as fixed reference points. In business, your benchmark is your fixed standard."},
+  {w:"Cash Flow",t:"noun",p:"/kæʃ fləʊ/",cat:"Finance",d:"The net movement of cash in and out of a business — the lifeblood of operations and the ultimate measure of financial health.",ex:["Positive operating cash flow, despite an accounting loss, reassured lenders that the business was fundamentally viable.","More businesses fail from poor cash flow management than from poor profitability — you can profit on paper and still run dry."],syn:["cash movement","liquidity flow","money flow","cash position"],tip:"Cash is king. Cash flow is whether the king has money in his pocket — not just on paper."},
+  {w:"Overhead",t:"noun",p:"/ˈoʊvərˌhɛd/",cat:"Finance",d:"Indirect costs of running a business that are not directly tied to production — such as rent, utilities, and administrative salaries.",ex:["The remote-first model eliminated office overhead, saving $2.1M annually which was reinvested in product development.","Understanding the difference between overhead and cost of goods sold is essential for accurate margin analysis."],syn:["indirect costs","fixed costs","operating expenses","running costs"],tip:"Literally: costs 'overhead' — the rent, lights, and admin that keep you running, not producing."},
+  {w:"Fixed Costs",t:"noun",p:"/fɪkst kɒsts/",cat:"Finance",d:"Business expenses that remain constant regardless of production volume or revenue level.",ex:["The company's high fixed cost base meant that any revenue shortfall had a magnified impact on profitability.","Reducing fixed costs during downturns is often the fastest lever for restoring profitability."],syn:["overhead","standing costs","committed costs","period costs"],tip:"Fixed = doesn't move. Whether you sell 100 or 10,000 units, your office rent is the same."},
+  {w:"Variable Costs",t:"noun",p:"/ˈvɛərɪəbəl kɒsts/",cat:"Finance",d:"Business expenses that change in proportion to the volume of goods or services produced.",ex:["As sales volume tripled, variable costs including materials and shipping scaled proportionally as expected.","Understanding variable vs fixed costs helps leaders model break-even points and optimize pricing strategy."],syn:["direct costs","production costs","unit costs","marginal costs"],tip:"Variable = it varies. More units sold → more variable cost. Less sold → less cost."},
+  {w:"Break-even Point",t:"noun",p:"/breɪk ˈiːvən pɔɪnt/",cat:"Finance",d:"The point at which total revenue equals total costs, resulting in neither profit nor loss.",ex:["At 850 units per month, the business reaches break-even — everything beyond that is pure profit.","Knowing your break-even point is the minimum financial intelligence required before launching any business."],syn:["zero-profit point","cost-revenue equilibrium","payback threshold"],tip:"Break = to break apart. Even = equal. Break-even = where costs and revenue finally split evenly."},
+  {w:"Expense Ratio",t:"noun",p:"/ɪkˈspɛns ˈreɪʃioʊ/",cat:"Finance",d:"The percentage of revenue consumed by operating expenses — used to measure operational efficiency.",ex:["The efficiency program reduced the expense ratio from 72% to 58%, adding 14 percentage points to operating margin.","Investors compare expense ratios across funds and companies to identify the most operationally efficient operators."],syn:["cost ratio","operating efficiency ratio","cost-to-income ratio"],tip:"What percentage of every dollar you earn goes to expenses? Lower is leaner."},
+  {w:"Term Sheet",t:"noun",p:"/tɜːrm ʃiːt/",cat:"Finance",d:"A non-binding document outlining the key terms and conditions of an investment or agreement before formal contracts are drafted.",ex:["The venture fund issued a term sheet with a $5M investment at a $20M pre-money valuation.","Founders should pay as much attention to governance terms in a term sheet as to valuation."],syn:["letter of intent","heads of agreement","deal summary","commitment outline"],tip:"A 'term sheet' lists the terms of a deal on one sheet — the framework before lawyers write the full contract."},
+  {w:"Pre-money Valuation",t:"noun",p:"/ˌpriː ˈmʌni ˌvæljuˈeɪʃən/",cat:"Finance",d:"The estimated value of a company before it receives the proposed investment funding.",ex:["With a $15M pre-money valuation and a $5M investment, the post-money valuation was $20M, giving investors a 25% stake.","Negotiating pre-money valuation is the most consequential moment in any fundraising round for founder equity."],syn:["pre-investment value","company worth before funding"],tip:"Pre = before. The company's value 'before' the investor's money lands."},
+  {w:"Economies of Scale",t:"noun",p:"/ɪˌkɒnəmiz əv skeɪl/",cat:"Finance",d:"Cost advantages that arise when production increases, enabling businesses to reduce per-unit costs as volume grows.",ex:["The manufacturer's economies of scale allowed it to undercut competitors on price while maintaining superior margins.","Cloud providers have achieved such extreme economies of scale that building your own data center rarely makes financial sense."],syn:["scale efficiencies","volume advantages","cost leverage","production efficiency"],tip:"The more you make, the cheaper each unit becomes. A factory of 1 vs. 1,000 — the 1,000 unit costs fraction."},
+  {w:"Supply Chain",t:"noun",p:"/səˈplaɪ tʃeɪn/",cat:"Operations",d:"The entire network of organizations, resources, and activities involved in producing and delivering a product from raw materials to end customer.",ex:["COVID-19 exposed how fragile single-source supply chains are — resilient companies quickly diversified their supplier base.","Supply chain visibility — knowing exactly where your goods are at all times — is now a strategic capability, not a luxury."],syn:["value chain","logistics network","procurement chain","production network"],tip:"A chain of suppliers, each linked to the next, from raw material to the customer's hands."},
+  {w:"Monetization",t:"noun",p:"/ˌmɒnɪtaɪˈzeɪʃən/",cat:"Strategy",d:"The process of generating revenue from a product, service, asset, or audience — converting something into a source of income.",ex:["After three years of free growth, the platform launched its monetization strategy through premium subscriptions.","Content creators use multiple monetization streams: ads, sponsorships, subscriptions, and merchandise."],syn:["revenue generation","commercialization","income generation"],tip:"'Monetize' = turn into money. Your product/service/content is the raw material; revenue is the output."},
+  {w:"Value Chain",t:"noun",p:"/ˈvæljuː tʃeɪn/",cat:"Strategy",d:"The full range of activities a company undertakes to create and deliver a product or service, from conception to delivery.",ex:["Porter's Value Chain analysis revealed that the company's strongest competitive advantage lay in after-sales service, not manufacturing.","Optimizing each link of the value chain — from procurement to delivery — is how operations leaders find margin improvement."],syn:["activity chain","business system","production process"],tip:"Each 'link' in the chain adds more value. The chain = all the steps from raw input to satisfied customer."},
+  {w:"Consolidation",t:"noun",p:"/kənˌsɒlɪˈdeɪʃən/",cat:"Strategy",d:"The merger or acquisition of multiple companies in an industry to create a smaller number of larger, more competitive firms.",ex:["Industry consolidation through mergers reduced the number of major players from twelve to four within a decade.","Market consolidation often leads to price increases as fewer competitors compete for the same customers."],syn:["merger","integration","combination","industry rollup"],tip:"Con = together, solid = firm. Consolidation firms up a fragmented market into solid, larger players."},
+  {w:"Traction",t:"noun",p:"/ˈtræk.ʃən/",cat:"Marketing",d:"Evidence of market validation and growing customer adoption — measurable proof that a product is resonating.",ex:["With 4,000 paying users and 15% monthly growth, the startup had undeniable traction for its Series A pitch.","Investors fund traction more than ideas — demonstrable, repeatable customer behavior is the most powerful evidence."],syn:["momentum","growth evidence","market proof","adoption"],tip:"Like car traction — grip on the road. Traction = your product is gripping the market and pulling forward."},
+  {w:"Freemium",t:"noun",p:"/ˈfriːmiəm/",cat:"Marketing",d:"A business model offering a free basic product to drive adoption, with premium paid features for advanced functionality.",ex:["Spotify's freemium model converts approximately 27% of free users to paid subscribers annually.","Freemium only works when the free tier is genuinely useful but the paid tier is compelling enough to justify upgrading."],syn:["free-to-premium","free tier model","gateway model"],tip:"Free + Premium = Freemium. Give enough away to hook them; offer enough extra to make them pay."},
+  {w:"Recurring Revenue",t:"noun",p:"/rɪˈkɜːrɪŋ ˈrɛvɪnjuː/",cat:"Finance",d:"Predictable, ongoing income that a business receives on a regular basis from subscriptions, retainers, or contracts.",ex:["Shifting clients to monthly retainers transformed the agency's cash flow from feast-and-famine to predictably recurring.","Investors assign premium valuations to recurring revenue because it de-risks future earnings."],syn:["ARR","MRR","subscription revenue","predictable income"],tip:"It 'recurs' — comes back reliably every month. Far more valuable than one-time transactions."},
+  {w:"Annual Recurring Revenue",t:"noun",p:"/ˈænjuəl rɪˈkɜːrɪŋ ˈrɛvɪnjuː/",cat:"Finance",d:"The annualized value of all recurring subscription contracts — the primary growth metric for SaaS and subscription businesses.",ex:["The SaaS company crossed $10M ARR with 340 enterprise customers, triggering its Series B fundraise.","ARR growth rate — ideally 100%+ at early stages — is the headline metric investors use to compare software businesses."],syn:["ARR","annualized revenue","subscription revenue run rate"],tip:"Take all your subscription contracts → annualize them → that's ARR. The north star of SaaS."},
+  {w:"Gross Margin",t:"noun",p:"/ɡrəʊs ˈmɑːdʒɪn/",cat:"Finance",d:"Revenue minus cost of goods sold, expressed as a percentage — measures the profitability of the core product before overhead.",ex:["Software companies target 70–80% gross margins because the marginal cost of an additional digital user is near zero.","Gross margin is the engine — if it's broken, no amount of cost-cutting will fix the business model."],syn:["gross profit margin","product margin","contribution margin"],tip:"Gross = before overhead. Gross margin shows how profitable your product is before you even pay the office rent."},
+];
+
+let learned = JSON.parse(localStorage.getItem('biz_learned') || '[]');
+let streak = parseInt(localStorage.getItem('biz_streak') || '0');
+let lastVisit = localStorage.getItem('biz_last_visit') || '';
+let quizScores = JSON.parse(localStorage.getItem('biz_quiz_scores') || '[]');
+let activeFilter = 'All';
+let todayIdx = 0;
+let quizWords = [], quizIdx = 0, quizCorrect = 0, quizAnswered = [];
+
+function getTodayWord() {
+  const start = new Date('2025-01-01');
+  const today = new Date();
+  const diff = Math.floor((today - start) / 86400000);
+  return WORDS[diff % WORDS.length];
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (lastVisit !== today) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (lastVisit === yesterday.toDateString()) streak++;
+    else streak = 1;
+    localStorage.setItem('biz_streak', streak);
+    localStorage.setItem('biz_last_visit', today);
+  }
+  document.getElementById('streak-count').textContent = streak;
+}
+
+function renderToday() {
+  const w = WORDS[todayIdx] || getTodayWord();
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('word-category').textContent = w.cat;
+  document.getElementById('word-name').textContent = w.w;
+  document.getElementById('word-type').textContent = w.t;
+  document.getElementById('word-pron').textContent = w.p;
+  document.getElementById('word-def').textContent = w.d;
+  const exHtml = w.ex.map(e => `<div class="example-block"><p class="example-text">"${e}"</p></div>`).join('');
+  document.getElementById('word-examples').innerHTML = exHtml;
+  const synHtml = w.syn.map(s => `<span class="syn-pill">${s}</span>`).join('');
+  document.getElementById('word-syns').innerHTML = synHtml;
+  document.getElementById('word-tip').textContent = w.tip;
+  document.getElementById('learned-msg').style.display = learned.includes(w.w) ? 'block' : 'none';
+}
+
+function markLearned() {
+  const w = WORDS[todayIdx] || getTodayWord();
+  if (!learned.includes(w.w)) {
+    learned.push(w.w);
+    localStorage.setItem('biz_learned', JSON.stringify(learned));
+  }
+  document.getElementById('learned-msg').style.display = 'block';
+  showToast('✓ Word marked as learned!');
+}
+
+function nextWord() {
+  todayIdx = (todayIdx + 1) % WORDS.length;
+  renderToday();
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.toLowerCase().includes(id.slice(0,4))) t.classList.add('active'); });
+  if (id === 'dictionary') renderDictionary();
+  if (id === 'progress') renderProgress();
+  if (id === 'quiz') renderQuizStats();
+}
+
+function getCategories() {
+  const cats = ['All', ...new Set(WORDS.map(w => w.cat))];
+  return cats;
+}
+
+function renderDictionary() {
+  const filterRow = document.getElementById('filter-row');
+  filterRow.innerHTML = getCategories().map(c => `<button class="filter-btn ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+  filterWords();
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  renderDictionary();
+}
+
+function filterWords() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = WORDS.filter(w => {
+    const matchCat = activeFilter === 'All' || w.cat === activeFilter;
+    const matchQ = !q || w.w.toLowerCase().includes(q) || w.d.toLowerCase().includes(q) || w.syn.join(' ').toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+  document.getElementById('dict-count').textContent = `(${filtered.length} words)`;
+  document.getElementById('word-list').innerHTML = filtered.map((w,i) => `
+    <div>
+      <div class="word-row" onclick="toggleExpand(${WORDS.indexOf(w)}, this)">
+        <div class="word-row-left">
+          <span class="word-row-name">${w.w}</span>
+          <span class="word-row-type">${w.t} · ${w.cat}</span>
+        </div>
+        <div class="word-row-right">
+          ${learned.includes(w.w) ? '<span class="learned-badge">✓ Learned</span>' : ''}
+          <span style="color:var(--text3);font-size:12px;">▼</span>
+        </div>
+      </div>
+      <div class="word-expanded" id="expand-${WORDS.indexOf(w)}" style="display:none;">
+        <div style="font-size:14px;color:var(--gold2);margin-bottom:8px;">${w.p}</div>
+        <p style="font-size:14px;color:var(--text);line-height:1.6;margin-bottom:10px;">${w.d}</p>
+        <div style="font-size:11px;color:var(--text3);letter-spacing:0.1em;margin-bottom:6px;">EXAMPLE</div>
+        <div class="example-block" style="margin-bottom:10px;"><p class="example-text">"${w.ex[0]}"</p></div>
+        <div style="font-size:11px;color:var(--text3);letter-spacing:0.1em;margin-bottom:6px;">SYNONYMS</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${w.syn.map(s=>`<span class="syn-pill">${s}</span>`).join('')}</div>
+        <button class="btn btn-green btn-sm" onclick="learnWord('${w.w}', event)">${learned.includes(w.w)?'✓ Learned':'Mark as Learned'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleExpand(idx, el) {
+  const exp = document.getElementById('expand-'+idx);
+  exp.style.display = exp.style.display === 'none' ? 'block' : 'none';
+}
+
+function learnWord(word, e) {
+  e.stopPropagation();
+  if (!learned.includes(word)) {
+    learned.push(word);
+    localStorage.setItem('biz_learned', JSON.stringify(learned));
+    showToast('✓ Added to learned words!');
+    filterWords();
+  }
+}
+
+function renderProgress() {
+  document.getElementById('p-learned').textContent = learned.length;
+  document.getElementById('p-streak').textContent = streak;
+  document.getElementById('p-total').textContent = WORDS.length;
+  const pct = Math.round((learned.length / WORDS.length) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '% complete';
+  const ll = document.getElementById('learned-list');
+  const nl = document.getElementById('no-learned');
+  if (learned.length) {
+    ll.innerHTML = learned.map(w => `<span class="learned-badge" style="cursor:default;">✓ ${w}</span>`).join('');
+    nl.style.display = 'none';
+  } else {
+    ll.innerHTML = '';
+    nl.style.display = 'block';
+  }
+}
+
+function renderQuizStats() {
+  const best = quizScores.length ? Math.max(...quizScores) : 0;
+  const avg = quizScores.length ? Math.round(quizScores.reduce((a,b)=>a+b,0)/quizScores.length) : 0;
+  document.getElementById('q-best').textContent = best + '%';
+  document.getElementById('q-played').textContent = quizScores.length;
+  document.getElementById('q-avg').textContent = avg + '%';
+}
+
+function startQuiz() {
+  quizWords = [...WORDS].sort(() => Math.random()-0.5).slice(0,10);
+  quizIdx = 0; quizCorrect = 0; quizAnswered = [];
+  document.getElementById('quiz-start').style.display = 'none';
+  document.getElementById('quiz-done').style.display = 'none';
+  document.getElementById('quiz-active').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const w = quizWords[quizIdx];
+  const types = ['def','syn','ex'];
+  const type = types[Math.floor(Math.random()*types.length)];
+  let question, correct;
+  if (type === 'def') {
+    question = `What does "${w.w}" mean?`;
+    correct = w.d;
+  } else if (type === 'syn') {
+    question = `Which word is a synonym of "${w.w}"?`;
+    correct = w.syn[0];
+  } else {
+    question = `Which word fits best in this sentence?\n"${w.ex[0].replace(new RegExp(w.w,'gi'),'______')}"`;
+    correct = w.w;
+  }
+  const others = WORDS.filter(x => x.w !== w.w).sort(() => Math.random()-0.5).slice(0,3);
+  let options = type === 'def' ? [correct, ...others.map(o=>o.d)] : type === 'syn' ? [correct, ...others.map(o=>o.syn[0])] : [correct, ...others.map(o=>o.w)];
+  options = options.sort(() => Math.random()-0.5);
+
+  const progress = document.getElementById('quiz-progress');
+  progress.innerHTML = quizWords.map((_,i) => `<div class="quiz-dot ${i < quizIdx ? (quizAnswered[i] ? 'correct' : 'wrong') : i === quizIdx ? 'done' : ''}"></div>`).join('');
+  document.getElementById('quiz-counter').textContent = `Question ${quizIdx+1} of 10`;
+  document.getElementById('quiz-question').textContent = question;
+  document.getElementById('quiz-feedback').style.display = 'none';
+  document.getElementById('quiz-options').innerHTML = options.map(o => `<button class="quiz-option" onclick="answerQuiz(this, '${o.replace(/'/g,"\\'")}', '${correct.replace(/'/g,"\\'")}', '${w.tip.replace(/'/g,"\\'")}')"><span>${o}</span></button>`).join('');
+}
+
+function answerQuiz(btn, chosen, correct, tip) {
+  document.querySelectorAll('.quiz-option').forEach(b => b.classList.add('disabled'));
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) document.querySelectorAll('.quiz-option').forEach(b => { if(b.querySelector('span').textContent === correct) b.classList.add('correct'); });
+  if (isCorrect) quizCorrect++;
+  quizAnswered[quizIdx] = isCorrect;
+  const fb = document.getElementById('quiz-feedback');
+  fb.style.display = 'block';
+  fb.innerHTML = isCorrect ? `<span style="color:var(--green);">✓ Correct!</span> <span style="color:var(--text2);font-size:13px;">— ${tip}</span>` : `<span style="color:var(--red);">✗ Incorrect.</span> <span style="color:var(--text2);font-size:13px;">${tip}</span><br><button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="nextQuestion()">Next →</button>`;
+  if (isCorrect) setTimeout(nextQuestion, 1500);
+}
+
+function nextQuestion() {
+  quizIdx++;
+  if (quizIdx >= quizWords.length) endQuiz();
+  else renderQuestion();
+}
+
+function endQuiz() {
+  const pct = Math.round((quizCorrect/quizWords.length)*100);
+  quizScores.push(pct);
+  localStorage.setItem('biz_quiz_scores', JSON.stringify(quizScores));
+  document.getElementById('quiz-active').style.display = 'none';
+  document.getElementById('quiz-done').style.display = 'block';
+  document.getElementById('quiz-final-score').textContent = pct + '%';
+  const msgs = { 100:'Perfect score! You\'re a business vocabulary master.', 80:'Excellent! Your business vocabulary is impressive.', 60:'Good work — a few more sessions and you\'ll master these.', 0:'Keep practicing — every session builds your vocabulary.' };
+  document.getElementById('quiz-final-msg').textContent = pct===100 ? msgs[100] : pct>=80 ? msgs[80] : pct>=60 ? msgs[60] : msgs[0];
+}
+
+function openEmailModal() {
+  document.getElementById('email-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('email-modal').classList.remove('open');
+}
+
+function sendEmail() {
+  const email = document.getElementById('email-input').value;
+  const w = WORDS[todayIdx] || getTodayWord();
+  const subject = encodeURIComponent(`📚 Business Word of the Day: ${w.w}`);
+  const body = encodeURIComponent(
+    `BUSINESS WORD OF THE DAY\n${new Date().toDateString()}\n\n`+
+    `WORD: ${w.w} (${w.t})\nPRONUNCIATION: ${w.p}\nCATEGORY: ${w.cat}\n\n`+
+    `DEFINITION:\n${w.d}\n\n`+
+    `EXAMPLES:\n1. ${w.ex[0]}\n2. ${w.ex[1]}\n\n`+
+    `SYNONYMS: ${w.syn.join(', ')}\n\n`+
+    `MEMORY TIP:\n${w.tip}\n\n---\nSent from BizLex Business Vocabulary Builder`
+  );
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  closeModal();
+  showToast('📧 Opening your mail client...');
+}
+
+function copyScript() {
+  const todayW = getTodayWord();
+  const script = `// BizLex Daily Word Email — Google Apps Script
+// Paste this in Google Sheets > Extensions > Apps Script
+// Set a daily Time-driven trigger at your preferred time
+
+function sendDailyWord() {
+  const words = ${JSON.stringify(WORDS.slice(0,30).map(w=>({w:w.w,t:w.t,p:w.p,d:w.d,ex:w.ex[0],syn:w.syn.join(', '),tip:w.tip})))};
+  const idx = Math.floor((new Date() - new Date('2025-01-01')) / 86400000) % words.length;
+  const word = words[idx];
+  const email = "YOUR_EMAIL@gmail.com"; // CHANGE THIS
+  const subject = "📚 Business Word of the Day: " + word.w;
+  const body = "WORD: " + word.w + " (" + word.t + ")\\nPRONUNCIATION: " + word.p + "\\n\\nDEFINITION:\\n" + word.d + "\\n\\nEXAMPLE:\\n" + word.ex + "\\n\\nSYNONYMS: " + word.syn + "\\n\\nMEMORY TIP:\\n" + word.tip;
+  GmailApp.sendEmail(email, subject, body);
+}`;
+  navigator.clipboard.writeText(script).then(() => {
+    document.getElementById('copy-confirm').style.display = 'block';
+    setTimeout(() => document.getElementById('copy-confirm').style.display = 'none', 3000);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+document.getElementById('email-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+const defaultIdx = WORDS.indexOf(getTodayWord());
+todayIdx = defaultIdx >= 0 ? defaultIdx : 0;
+updateStreak();
+renderToday();
+</script>
+</body>
+</html>
